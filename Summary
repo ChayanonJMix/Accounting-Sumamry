@@ -1,0 +1,1112 @@
+function forAccounting() {
+  // checkCondition()                // (Hold) Check Condition before start Export Accouting Summary  
+  clearDataType()
+  summaryAcc()
+  generateFolderAndCover()
+  // sendToIntegromat()           // ใส่ไว้แล้วในขั้นตอนสุดท้ายของ generateFolderAndCover()
+}
+
+
+function onlySummary() {
+  // checkCondition()
+  summaryAcc()
+}
+
+
+function clearDataType() {
+  Logger.log("Start clearDataType()")
+  
+  // get ID
+  var id_workbook = SpreadsheetApp.openById("1oqcDtndzc7VGEUarpFZoQ3IrgUh_Y0TSbUTcWbVQDLc");
+  var id_sheet = id_workbook.getSheetByName("ID");
+  var summaryAcc_id = id_sheet.getRange(11,2).getValue();
+  Logger.log(summaryAcc_id)
+
+  
+  // Get all sheet that need to clear
+  var summaryAcc = SpreadsheetApp.openById(summaryAcc_id);
+  // Type 1
+  var sheetType1 = summaryAcc.getSheetByName("DB:Type_1");
+  if (sheetType1.getLastRow() > 1) {
+    var range1 = sheetType1.getRange(2,1,sheetType1.getLastRow()-1,sheetType1.getLastColumn());
+    range1.clearContent()
+  }
+  // Type 2
+  var sheetType2 = summaryAcc.getSheetByName("DB:Type_2");
+  if (sheetType2.getLastRow() > 1) {
+    var range2 = sheetType2.getRange(2,1,sheetType2.getLastRow()-1,sheetType2.getLastColumn());
+    range2.clearContent()
+  }
+  // Type 3
+  var sheetType3 = summaryAcc.getSheetByName("DB:Type_3");
+  if (sheetType3.getLastRow() > 1) {
+    var range3 = sheetType3.getRange(2,1,sheetType3.getLastRow()-1,sheetType3.getLastColumn());
+    range3.clearContent()
+  }
+  // Type 4
+  var sheetType4 = summaryAcc.getSheetByName("DB:Type_4");
+  if (sheetType4.getLastRow() > 1) {
+    var range4 = sheetType4.getRange(2,1,sheetType4.getLastRow()-1,sheetType4.getLastColumn());
+    range4.clearContent()
+  }
+  // Type 5
+  var sheetType5 = summaryAcc.getSheetByName("DB:Type_5");
+  if (sheetType5.getLastRow() > 1) {
+    var range5 = sheetType5.getRange(2,1,sheetType5.getLastRow()-1,sheetType5.getLastColumn());
+    range5.clearContent()
+  }
+  // Type 6
+  var sheetType6 = summaryAcc.getSheetByName("DB:Type_6");
+  if (sheetType6.getLastRow() > 1) {
+    var range6 = sheetType6.getRange(2,1,sheetType6.getLastRow()-1,sheetType6.getLastColumn());
+    range6.clearContent()
+  }
+  // Type 7
+  var sheetType7 = summaryAcc.getSheetByName("DB:Type_7");
+  if (sheetType7.getLastRow() > 1) {
+    var range7 = sheetType7.getRange(2,1,sheetType7.getLastRow()-1,sheetType7.getLastColumn());
+    range7.clearContent()
+  }
+  // Type 8
+  var sheetType8 = summaryAcc.getSheetByName("DB:Type_8");
+  if (sheetType8.getLastRow() > 1) {
+    var range8 = sheetType8.getRange(2,1,sheetType8.getLastRow()-1,sheetType8.getLastColumn());
+    range8.clearContent()
+  }
+  // Type 9
+  var sheetType9 = summaryAcc.getSheetByName("DB:Type_9");
+  if (sheetType9.getLastRow() > 1) {
+    var range9 = sheetType9.getRange(2,1,sheetType9.getLastRow()-1,sheetType9.getLastColumn());
+    range9.clearContent()
+  }
+  Logger.log("End clearDataType()")
+}
+
+
+function summaryAcc() {
+  Logger.log("Start Summary Acc") 
+  // get ID
+  var id_workbook = SpreadsheetApp.openById("1oqcDtndzc7VGEUarpFZoQ3IrgUh_Y0TSbUTcWbVQDLc");
+  var id_sheet = id_workbook.getSheetByName("ID");
+
+  //Get database Workbook
+    var database_id = id_sheet.getRange(6,2).getValue();
+    var workbook = SpreadsheetApp.openById(database_id);
+  //Get sheet "Reservation" in Workbook
+    var sheet = workbook.getSheetByName("Reservation");
+
+  //get last row without formular >> use reservation no. column to check row no.
+    var countRow = sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues();
+    var rowNum = countRow.filter(function(row) { return row[0] != "" ; });
+          //check
+            // Logger.log(rowNum.length);
+
+  //Get allData in Sheet
+    var allData = sheet.getRange(2,1,rowNum.length,43).getValues();
+
+  //Get sheet "Debit/Credit" in Workbook from database
+    var sheet_DC = workbook.getSheetByName("Debit/Credit");
+    var allData_DC = sheet_DC.getRange(2,1,sheet_DC.getLastRow()-1,12).getValues();
+          //Check
+          // Logger.log(allData_DC);
+
+
+  //Get sheet "Summary" from Acc. Summary
+    var summaryAcc_id = id_sheet.getRange(11,2).getValue();
+    var summaryAcc = SpreadsheetApp.openById(summaryAcc_id);
+    var summaryAcc_summary = summaryAcc.getSheetByName("Summary");
+
+  //Get ExportMonth from Summary Accounting
+    var summaryAcc_command = summaryAcc.getSheetByName("Command");
+    var exportMonth = summaryAcc_command.getRange(2,2).getValue();
+    var exportYear = summaryAcc_command.getRange(3,2).getValue();
+    var dataDate = new Date(exportYear + exportMonth)
+    var exportFirstDate = new Date(dataDate.getFullYear(),dataDate.getMonth(),1)
+    var exportLastDate = new Date(dataDate.getFullYear(),dataDate.getMonth()+1,0)
+    // Check
+      // Logger.log(exportFirstDate)
+      // Logger.log(exportLastDate)
+
+  // item[3] >> Source
+  // item[7] >> Datebook 
+  // item[8] >> Check-in Date
+  // item[16] >> Status
+
+  //Filter Data by type 1
+    var dataType1 = allData.filter(function(item) { 
+      return (
+      item[7].valueOf() >= exportFirstDate.valueOf() && item[7].valueOf() <= exportLastDate.valueOf()             
+      && item[8].valueOf() >= exportFirstDate.valueOf() && item[8].valueOf() <= exportLastDate.valueOf()   
+      && (item[16] == "in_house" || item[16] == "checked_out")                        
+      && (item[3] == "Walk-In" || item[3] == "Website / Booking Engine" || item[3] == "Phone" || item[3] == "Email")
+      );                      
+    });
+    Logger.log("Data Type 1");
+    // Logger.log(dataType1.length);
+    // Logger.log(dataType1);
+    //Get Target Sheet
+    var sheetType1 = summaryAcc.getSheetByName("DB:Type_1");
+    //Set Value to Target Sheet
+    if(dataType1.length > 0) {
+      sheetType1.getRange(2,1,dataType1.length,dataType1[0].length).setValues(dataType1);
+    }
+  //Accounting Summary Type 1
+    // 1. เอาแต่ละ Row ไปหาค่าที่ Match กับ Reservation Number ได้ออกมาเป็น ARR
+    // 2. นำ ARR ที่ได้มาแยกตาม Cash / BT / Cr.
+    // 3. ผลรวมของแต่ละรายการที่แยกมา ไปไใส่ใน Acc. Summary
+    var cash = 0
+    var bank_transfer = 0
+    var credit_card = 0
+    
+    // item[8] >> Description
+    // item[9] >> Amount
+    
+    dataType1.forEach(function(data) { 
+      var dataType1_data = allData_DC.filter(function(item) {
+        return ( data[0] == item[1]);
+      });
+      dataType1_data.forEach(function(item) {
+        switch(item[8]) {
+          case "Cash":
+            cash = cash + item[9]
+            break;
+          case "Bank Transfer":
+            bank_transfer = bank_transfer + item[9]
+            break;
+          case "Credit Card":
+            credit_card = credit_card + item[9]
+            break;
+        }
+      });
+    });
+    summaryAcc_summary.getRange(6,3).setValue(cash);
+    summaryAcc_summary.getRange(7,3).setValue(bank_transfer);
+    summaryAcc_summary.getRange(8,3).setValue(credit_card);
+  //Debit/Credit Summary
+
+
+  // item[13] >> Payment Type
+  // item[23] >> PMT Status 
+  // item[8] >> Check-in Date
+  // item[16] >> Status
+
+  //Filter Data by type 2
+    var dataType2 = allData.filter(function(item) { 
+      //criteria Type 2
+      return (
+      item[8].valueOf() >= exportFirstDate.valueOf() && item[8].valueOf() <= exportLastDate.valueOf() 
+      && item[16] != "canceled" 
+      && item[13] == "Channel Collect" 
+      && item[23] == "");
+    });
+    Logger.log("Data Type 2");
+    // Logger.log(dataType2.length);
+    // Logger.log(dataType2);
+  //Get Target Sheet
+    var sheetType2 = summaryAcc.getSheetByName("DB:Type_2");
+  //Set Value to Target Sheet
+    if(dataType2.length > 0) {
+      sheetType2.getRange(2,1,dataType2.length,dataType2[0].length).setValues(dataType2);
+    }
+  //Accounting Summary Type 2
+    var agoda_ar = 0
+    var agoda_ap = 0
+    var booking_ar = 0
+    var booking_ap = 0
+    var traveloka_ar = 0
+    var traveloka_ap = 0
+    var expedia_ar = 0
+    var expedia_ap = 0
+    var ctrip_ar = 0
+    var ctrip_ap = 0
+
+    // item[3] >> Source
+    // item[15] >> Actual Amount
+    // item[20] >> Charge Fee
+    // item[21] >> Commission
+
+    dataType2.forEach(function(item) {
+      switch(item[3]) {
+        case "Agoda":
+          agoda_ar = agoda_ar + item[15]
+          agoda_ap = agoda_ap + item[20] + item[21]
+          break;
+        case "Booking.com":
+          booking_ar = booking_ar + item[15]
+          booking_ap = booking_ap + item[20] + item[21]
+          break;
+        case "Expedia":
+          expedia_ar = expedia_ar + item[15]
+          expedia_ap = expedia_ap + item[20] + item[21]
+          break;
+        case "Traveloka":
+          traveloka_ar = traveloka_ar + item[15]
+          traveloka_ap = traveloka_ap + item[20] + item[21]
+          break;
+        case "Ctrip":
+          ctrip_ar = ctrip_ar + item[15]
+          ctrip_ap = ctrip_ap + item[20] + item[21]
+          break;
+      }
+    });
+    //AR
+    summaryAcc_summary.getRange(9,4).setValue(agoda_ar);
+    summaryAcc_summary.getRange(10,4).setValue(booking_ar);
+    summaryAcc_summary.getRange(11,4).setValue(expedia_ar);
+    summaryAcc_summary.getRange(12,4).setValue(traveloka_ar);
+    summaryAcc_summary.getRange(13,4).setValue(ctrip_ar);
+    //AP
+    summaryAcc_summary.getRange(20,4).setValue(agoda_ap);
+    summaryAcc_summary.getRange(21,4).setValue(booking_ap);
+    summaryAcc_summary.getRange(22,4).setValue(expedia_ap);
+    summaryAcc_summary.getRange(23,4).setValue(traveloka_ap);
+    summaryAcc_summary.getRange(24,4).setValue(ctrip_ap);
+
+
+  // item[8] >> Check-in Date
+  // item[13] >> Payment Type
+  // item[16] >> Status
+  // item[22] >> PMT Date
+  // item[23] >> PMT Status 
+
+  //Filter Data by type 3
+    var dataType3 = allData.filter(function(item) { 
+      //criteria Type 3
+      if (item[21] == "") {
+      } else {
+        return (
+        item[8].valueOf() >= exportFirstDate.valueOf() && item[8].valueOf() <= exportLastDate.valueOf() 
+        && item[16] != "canceled" 
+        && item[13] == "Channel Collect" 
+        && item[23] == "Paid" 
+        && item[22].valueOf() >= exportFirstDate.valueOf() && item[21].valueOf() <= exportLastDate.valueOf() );
+      }
+    });
+    Logger.log("Data Type 3");
+    // Logger.log(dataType3.length);
+  //Get Target Sheet
+    var sheetType3 = summaryAcc.getSheetByName("DB:Type_3");
+  //Set Value to Target Sheet
+    if(dataType3.length > 0) {
+      sheetType3.getRange(2,1,dataType3.length,dataType3[0].length).setValues(dataType3);
+    }
+  //Accounting Summary Type 3
+    var agoda_ar = 0
+    var agoda_ap = 0
+    var booking_ar = 0
+    var booking_ap = 0
+    var traveloka_ar = 0
+    var traveloka_ap = 0
+    var expedia_ar = 0
+    var expedia_ap = 0
+    var ctrip_ar = 0
+    var ctrip_ap = 0
+    
+    // item[3] >> Source
+    // item[15] >> Actual Amount
+    // item[20] >> Charge Fee
+    // item[21] >> Commission
+    
+    dataType3.forEach(function(item) {
+      switch(item[3]) {
+        case "Agoda":
+          agoda_ar = agoda_ar + item[15]
+          agoda_ap = agoda_ap + item[20] + item[21]
+          break;
+        case "Booking.com":
+          booking_ar = booking_ar + item[15]
+          booking_ap = booking_ap + item[20] + item[21]
+          break;
+        case "Expedia":
+          expedia_ar = expedia_ar + item[15]
+          expedia_ap = expedia_ap + item[20] + item[21]
+          break;
+        case "Traveloka":
+          traveloka_ar = traveloka_ar + item[15]
+          traveloka_ap = traveloka_ap + item[20] + item[21]
+          break;
+        case "Ctrip":
+          ctrip_ar = ctrip_ar + item[15]
+          ctrip_ap = ctrip_ap + item[20] + item[21]
+          break;
+      }
+    });
+    //AR
+    summaryAcc_summary.getRange(9,5).setValue(agoda_ar);
+    summaryAcc_summary.getRange(10,5).setValue(booking_ar);
+    summaryAcc_summary.getRange(11,5).setValue(expedia_ar);
+    summaryAcc_summary.getRange(12,5).setValue(traveloka_ar);
+    summaryAcc_summary.getRange(13,5).setValue(ctrip_ar);
+    //AP
+    summaryAcc_summary.getRange(20,5).setValue(agoda_ap);
+    summaryAcc_summary.getRange(21,5).setValue(booking_ap);
+    summaryAcc_summary.getRange(22,5).setValue(expedia_ap);
+    summaryAcc_summary.getRange(23,5).setValue(traveloka_ap);
+    summaryAcc_summary.getRange(24,5).setValue(ctrip_ap);
+
+  // item[8] >> Check-in Date
+  // item[13] >> Payment Type
+  // item[16] >> Status
+  // item[22] >> PMT Date
+  // item[23] >> PMT Status 
+
+  //Filter Data by type 4
+    var dataType4 = allData.filter(function(item) { 
+      //ต้องใส่ IF_Else เพื่อให้ข้าม Row ที่ไม่มีข้อมูลไป ไม่งั้นจะ Error
+      //criteria Type 4
+      if (item[21] == "") {
+      } else {
+        return (
+        item[8].valueOf() < exportFirstDate.valueOf() 
+        && item[16] != "canceled" 
+        && item[13] == "Channel Collect" 
+        && item[23] == "Paid"
+        && item[22].valueOf() >= exportFirstDate.valueOf() && item[21].valueOf() <= exportLastDate.valueOf()
+        );
+      }
+    });
+    Logger.log("Data Type 4");
+    // Logger.log(dataType4.length);
+    // Logger.log(dataType4);
+  //Get Target Sheet
+    var sheetType4 = summaryAcc.getSheetByName("DB:Type_4");
+  //Set Value to Target Sheet
+    if(dataType4.length > 0) {
+      sheetType4.getRange(2,1,dataType4.length,dataType4[0].length).setValues(dataType4);
+    }
+  //Accounting Summary Type 4
+    var agoda_ar = 0
+    var agoda_ap = 0
+    var booking_ar = 0
+    var booking_ap = 0
+    var traveloka_ar = 0
+    var traveloka_ap = 0
+    var expedia_ar = 0
+    var expedia_ap = 0
+    var ctrip_ar = 0
+    var ctrip_ap = 0
+    
+    // item[3] >> Source
+    // item[15] >> Actual Amount
+    // item[20] >> Charge Fee
+    // item[21] >> Commission
+    
+    dataType4.forEach(function(item) {
+      switch(item[3]) {
+        case "Agoda":
+          agoda_ar = agoda_ar + item[15]
+          agoda_ap = agoda_ap + item[20] + item[21]
+          break;
+        case "Booking.com":
+          booking_ar = booking_ar + item[15]
+          booking_ap = booking_ap + item[20] + item[21]
+          break;
+        case "Expedia":
+          expedia_ar = expedia_ar + item[15]
+          expedia_ap = expedia_ap + item[20] + item[21]
+          break;
+        case "Traveloka":
+          traveloka_ar = traveloka_ar + item[15]
+          traveloka_ap = traveloka_ap + item[20] + item[21]
+          break;
+        case "Ctrip":
+          ctrip_ar = ctrip_ar + item[15]
+          ctrip_ap = ctrip_ap + item[20] + item[21]
+          break;
+      }
+    });
+    //AR
+    summaryAcc_summary.getRange(9,6).setValue(agoda_ar);
+    summaryAcc_summary.getRange(10,6).setValue(booking_ar);
+    summaryAcc_summary.getRange(11,6).setValue(expedia_ar);
+    summaryAcc_summary.getRange(12,6).setValue(traveloka_ar);
+    summaryAcc_summary.getRange(13,6).setValue(ctrip_ar);
+    //AP
+    summaryAcc_summary.getRange(20,6).setValue(agoda_ap);
+    summaryAcc_summary.getRange(21,6).setValue(booking_ap);
+    summaryAcc_summary.getRange(22,6).setValue(expedia_ap);
+    summaryAcc_summary.getRange(23,6).setValue(traveloka_ap);
+    summaryAcc_summary.getRange(24,6).setValue(ctrip_ap);
+
+  // item[8] >> Check-in Date
+  // item[13] >> Payment Type
+  // item[16] >> Status
+  // item[21] >> Commission
+
+  //Filter Data by type 5
+    var dataType5 = allData.filter(function(item) { 
+      //criteria Type 5
+      //typeof เป็นการเช็คค่า Type ของ Value นั้นๆ
+      if (typeof item[21] == "number") {
+      return (
+      item[8].valueOf() >= exportFirstDate.valueOf() && item[8].valueOf() <= exportLastDate.valueOf() 
+      && item[13] == "Hotel Collect" 
+      && item[21] > 0
+      && (item[16] == "in_house" || item[16] == "checked_out"));
+      } else {
+      }
+    });
+
+    Logger.log("Data Type 5");
+    // Logger.log(dataType5.length);
+    // Logger.log(dataType5);
+  //Get Target Sheet
+    var sheetType5 = summaryAcc.getSheetByName("DB:Type_5");
+  //Set Value to Target Sheet
+    if(dataType5.length > 0) {
+      sheetType5.getRange(2,1,dataType5.length,dataType5[0].length).setValues(dataType5);
+    }
+  //Accounting Summary Type 5
+    var cash = 0
+    var bank_transfer = 0
+    var credit_card = 0
+    
+    // item[8] >> Description
+    // item[9] >> Amount
+    
+    dataType5.forEach(function(data) { 
+      var dataType5_data = allData_DC.filter(function(item) {
+        return (data[0] == item[1]);
+      });
+      dataType5_data.forEach(function(item) {
+        switch(item[7]) {
+          case "Cash":
+            cash = cash + item[9]
+            break;
+          case "Bank Transfer":
+            bank_transfer = bank_transfer + item[9]
+            break;
+          case "Credit Card":
+            credit_card = credit_card + item[9]
+            break;
+        }
+      });
+    });
+    summaryAcc_summary.getRange(6,7).setValue(cash);
+    summaryAcc_summary.getRange(7,7).setValue(bank_transfer);
+    summaryAcc_summary.getRange(8,7).setValue(credit_card);
+      var agoda_ap = 0
+      var booking_ap = 0
+      var traveloka_ap = 0
+      var expedia_ap = 0
+      var ctrip_ap = 0
+      
+      // item[3] >> Source
+      // item[20] >> Charge Fee
+      // item[21] >> Commission
+      
+      //find commission and charge fee
+      dataType5.forEach(function(item) {
+          switch(item[3]) {
+            case "Agoda":
+              agoda_ap = agoda_ap + item[20] + item[21]
+              break;
+            case "Booking.com":
+              booking_ap = booking_ap + item[20] + item[21]
+              break;
+            case "Expedia":
+              expedia_ap = expedia_ap + item[20] + item[21]
+              break;
+            case "Traveloka":
+              traveloka_ap = traveloka_ap + item[20] + item[21]
+              break;
+            case "Ctrip":
+              ctrip_ap = ctrip_ap + item[20] + item[21]
+              break;
+          }
+        });  
+      //AP
+      summaryAcc_summary.getRange(20,7).setValue(agoda_ap);
+      summaryAcc_summary.getRange(21,7).setValue(booking_ap);
+      summaryAcc_summary.getRange(22,7).setValue(expedia_ap);
+      summaryAcc_summary.getRange(23,7).setValue(traveloka_ap);
+      summaryAcc_summary.getRange(24,7).setValue(ctrip_ap);
+
+  // item[13] >> Payment Type
+  // item[42] >> HTCC Status
+  // item[43] >> HTCC Paid Date
+
+  //Filter Data by type 6
+  var dataType6 = allData.filter(function(item) { 
+      //criteria Type 6
+      //typeof เป็นการเช็คค่า Type ของ Value นั้นๆ
+      
+      if (item[42].toString() == "") {
+      } else {
+      return (
+      item[43].valueOf() >= exportFirstDate.valueOf() && item[43].valueOf() <= exportLastDate.valueOf() 
+      && item[13] == "Hotel Collect" 
+      && item[42] == "Paid" );    
+      }
+    });
+
+    Logger.log("Data Type 6");
+    // Logger.log(dataType6.length);
+    // Logger.log(dataType6);
+  //Get Target Sheet
+    var sheetType6 = summaryAcc.getSheetByName("DB:Type_6");
+  //Set Value to Target Sheet
+    if(dataType6.length > 0) {
+      sheetType6.getRange(2,1,dataType6.length,dataType6[0].length).setValues(dataType6);
+    }
+  //Accounting Summary Type 6
+    //Get Accounting Logbook
+    var accLogbook_id = id_sheet.getRange(5,2).getValue();
+    var accLogbook = SpreadsheetApp.openById(accLogbook_id);
+    var accLogbook_manual = accLogbook.getSheetByName("Manual Payment Logbook");
+    var accLogbook_manual_data = accLogbook_manual.getRange(2,1,accLogbook_manual.getLastRow()-1,9).getValues();
+
+    var cash = 0
+    var bank_transfer = 0
+    var credit_card = 0
+    var bill_to_inv = []
+    
+    // item[41] >> Bill to INV
+    
+    dataType6.forEach(function(item) {
+      if (item[41] == "") {
+      } else {
+        var check_pcnumber = bill_to_inv.findIndex(function(pcnumber) {
+          return pcnumber == item[41]
+        });
+        if (check_pcnumber == -1){
+          bill_to_inv.push(item[41]);
+        }
+      }
+    });
+    
+    // item[0] >> Bill to INV
+    // item[4] >> Payment Method
+    // item[7] >> Commission to Pay
+    
+    bill_to_inv.forEach(function(pcnumber) {
+      accLogbook_manual_data.forEach(function(item) {
+        if (pcnumber == item[0] ) {
+          switch(item[4]) {
+          case "Cash":
+            cash = cash + item[7]
+            break;
+          case "Bank Transfer":
+            bank_transfer = bank_transfer + item[7]
+            break;
+          case "Credit Card":
+            credit_card = credit_card + item[7]
+            break;
+          }
+        }
+      });
+    });
+    summaryAcc_summary.getRange(6,8).setValue(cash);
+    summaryAcc_summary.getRange(7,8).setValue(bank_transfer);
+    summaryAcc_summary.getRange(8,8).setValue(credit_card);
+    var agoda_ap = 0
+    var booking_ap = 0
+    var traveloka_ap = 0
+    var expedia_ap = 0
+    var ctrip_ap = 0
+      
+    // item[3] >> Source
+    // item[20] >> Charge Fee
+    // item[21] >> Commission
+      
+      //find commission and charge fee
+      dataType6.forEach(function(item) {
+          switch(item[3]) {
+            case "Agoda":
+              agoda_ap = agoda_ap + item[20] + item[21]
+              break;
+            case "Booking.com":
+              booking_ap = booking_ap + item[20] + item[21]
+              break;
+            case "Expedia":
+              expedia_ap = expedia_ap + item[20] + item[21]
+              break;
+            case "Traveloka":
+              traveloka_ap = traveloka_ap + item[20] + item[21]
+              break;
+            case "Ctrip":
+              ctrip_ap = ctrip_ap + item[20] + item[21]
+              break;
+          }
+        });  
+      //AP
+      summaryAcc_summary.getRange(20,8).setValue(agoda_ap);
+      summaryAcc_summary.getRange(21,8).setValue(booking_ap);
+      summaryAcc_summary.getRange(22,8).setValue(expedia_ap);
+      summaryAcc_summary.getRange(23,8).setValue(traveloka_ap);
+      summaryAcc_summary.getRange(24,8).setValue(ctrip_ap);
+
+  // item[7] >> Book Date
+  // item[3] >> Source
+  // item[13] >> Payment Type
+  // item[16] >> Status
+
+  //Filter Data by type 7
+    var dataType7 = allData.filter(function(item) { 
+      //criteria Type 7
+      return (
+      item[7].valueOf() >= exportFirstDate.valueOf() && item[7].valueOf() <= exportLastDate.valueOf()
+      && item[8].valueOf() > exportLastDate.valueOf() 
+      && (item[16] == "confirmed") 
+      && (item[3] == "Walk-In" || item[3] == "Website / Booking Engine" || item[3] == "Phone" || item[3] == "Email")
+      )}
+    );
+    Logger.log("Data Type 7");
+    // Logger.log(dataType7.length);
+    // Logger.log(dataType7);
+  //Get Target Sheet
+    var sheetType7 = summaryAcc.getSheetByName("DB:Type_7");
+  //Set Value to Target Sheet
+    if(dataType7.length > 0) {
+      sheetType7.getRange(2,1,dataType7.length,dataType7[0].length).setValues(dataType7);
+    }
+  //Accounting Summary Type 7
+    var cash = 0
+    var bank_transfer = 0
+    var credit_card = 0
+    
+    // item[8] >> Description
+    // item[9] >> Amount
+    
+    dataType7.forEach(function(data) { 
+      var dataType7_data = allData_DC.filter(function(item) {
+        return (data[0] == item[1]);
+      });
+      dataType7_data.forEach(function(item) {
+        switch(item[8]) {
+          case "Cash":
+            cash = cash + item[9]
+            break;
+          case "Bank Transfer":
+            bank_transfer = bank_transfer + item[9]
+            break;
+          case "Credit Card":
+            credit_card = credit_card + item[9]
+            break;
+        }
+      });
+    });
+    summaryAcc_summary.getRange(6,9).setValue(cash);
+    summaryAcc_summary.getRange(7,9).setValue(bank_transfer);
+    summaryAcc_summary.getRange(8,9).setValue(credit_card);
+
+  // item[7] >> Book Date
+  // item[3] >> Source
+  // item[13] >> Payment Type
+  // item[16] >> Status
+
+  //Filter Data by type 8
+    var dataType8 = allData.filter(function(item) { 
+      //criteria Type 8
+      return (
+      item[7].valueOf() < exportFirstDate.valueOf() 
+      && item[8].valueOf() >= exportFirstDate.valueOf() && item[8].valueOf() <= exportLastDate.valueOf() 
+      && (item[16] == "in_house" || item[16] == "checked_out") 
+      && (item[3] == "Walk-In" || item[3] == "Website / Booking Engine" || item[3] == "Phone" || item[3] == "Email")
+      );
+    });
+    Logger.log("Data Type 8");
+    // Logger.log(dataType8.length);
+    // Logger.log(dataType8);
+  //Get Target Sheet
+    var sheetType8 = summaryAcc.getSheetByName("DB:Type_8");
+  //Set Value to Target Sheet
+    if(dataType8.length > 0) {
+      sheetType8.getRange(2,1,dataType8.length,dataType8[0].length).setValues(dataType8);
+    }
+  //Accounting Summary Type 8
+    var deferred_income = 0
+    
+    // item[15] >> Actual Amount
+    
+    dataType8.forEach(function(item) {
+      deferred_income = deferred_income + item[15]
+    });
+    //AR
+    summaryAcc_summary.getRange(15,10).setValue(deferred_income);
+    
+  // item[3] >> Source
+  // item[7] >> Book Date
+  // item[16] >> Status
+  // item[36] >> Cancellation Date
+
+  //Filter Data by type 9
+    var dataType9 = allData.filter(function(item) { 
+      //criteria Type 9
+      if (item[35] == "") {
+      } else {
+      return (
+      item[7].valueOf() < exportFirstDate 
+      && item[36].valueOf() >= exportFirstDate.valueOf() && item[35].valueOf() <= exportLastDate.valueOf() 
+      && item[16] == "canceled" 
+      && (item[3] == "Walk-In" || item[3] == "Website / Booking Engine" || item[3] == "Phone" || item[3] == "Email")
+      )}
+    });
+    Logger.log("Data Type 9");
+    // Logger.log(dataType9.length);
+    // Logger.log(dataType9);
+  //Get Target Sheet
+    var sheetType9 = summaryAcc.getSheetByName("DB:Type_9");
+  //Set Value to Target Sheet
+    if(dataType9.length > 0) {
+      sheetType9.getRange(2,1,dataType9.length,dataType9[0].length).setValues(dataType9);
+    }
+  //Accounting Summary Type 9
+    var deferred_income = 0
+
+    // item[15] >> Actual Amount
+
+      dataType9.forEach(function(item) {
+        deferred_income = deferred_income + item[15]
+      });
+      //AR
+      summaryAcc_summary.getRange(15,10).setValue(deferred_income);
+    //Get sheet "Refund" in Workbook from database
+    var sheet_refund = workbook.getSheetByName("Refund");
+    var allData_refund = sheet_refund.getRange(2,1,sheet_refund.getLastRow()-1,12).getValues();
+    
+    var refund = 0
+    var cash = 0
+    var bank_transfer = 0
+    var credit_card = 0
+    
+    // ของ Sheet refund
+    // item[8] >> Description
+    // item[9] >> Amount
+    
+    dataType9.forEach(function(data) { 
+      var dataType9_data = allData_refund.filter(function(item) {
+        return (data[0] == item[1]);
+      });
+      dataType9_data.forEach(function(item) {
+        switch(item[8]) {
+          case "Cash":
+            cash = cash + (item[9]*(-1))
+            break;
+          case "Bank Transfer":
+            bank_transfer = bank_transfer + (item[9]*(-1))
+            break;
+          case "Credit Card":
+            credit_card = credit_card + (item[9]*(-1))
+            break;
+        }
+      });
+    });
+    refund = (cash + bank_transfer + credit_card)
+    summaryAcc_summary.getRange(6,11).setValue(cash);
+    summaryAcc_summary.getRange(7,11).setValue(bank_transfer);
+    summaryAcc_summary.getRange(8,11).setValue(credit_card);
+    summaryAcc_summary.getRange(18,11).setValue(refund);
+    Logger.log("End Summary Acc") 
+  //End summaryAcc()
+}
+
+
+function generateFolderAndCover() {
+  Logger.log("Start generateFolderAndCover()")
+  var id_workbook = SpreadsheetApp.openById("1oqcDtndzc7VGEUarpFZoQ3IrgUh_Y0TSbUTcWbVQDLc");
+  var id_sheet = id_workbook.getSheetByName("ID");
+  // Folder Name
+  var accountingSummaryId = id_sheet.getRange(11,2).getValue();
+  var accountingSummary = SpreadsheetApp.openById(accountingSummaryId)
+  var workbook_command = accountingSummary.getSheetByName("Command")
+  var getmonth_data = workbook_command.getRange(2,2).getValue()
+  var getyear_data = workbook_command.getRange(3,2).getValue()
+  
+  //access Folder
+  var accountingFolder_id = id_sheet.getRange(2,2).getValue();
+  var accountingFolder_2021_id = id_sheet.getRange(3,2).getValue();
+  
+  var accountingFolder = DriveApp.getFolderById(accountingFolder_id)
+  var accountingFolder_2021 = DriveApp.getFolderById(accountingFolder_2021_id)
+
+  //create main folder
+  var mainFolderId = accountingFolder_2021.createFolder(getmonth_data + " - " + getyear_data).getId()
+  var mainFolder = DriveApp.getFolderById(mainFolderId)
+
+  // create folder type 1-9
+  var type_1 = mainFolder.createFolder("Type 1").getId()
+  var folder_type_1 = DriveApp.getFolderById(type_1)
+  var invoice_type_1 = folder_type_1.createFolder("Invoice").getId()
+  var type_2 = mainFolder.createFolder("Type 2").getId()
+  var folder_type_2 = DriveApp.getFolderById(type_2)
+  var invoice_type_2 = folder_type_2.createFolder("Invoice").getId()
+  var type_3 = mainFolder.createFolder("Type 3").getId()
+  var folder_type_3 = DriveApp.getFolderById(type_3)
+  var invoice_type_3 = folder_type_3.createFolder("Invoice").getId()
+  var type_4 = mainFolder.createFolder("Type 4").getId()
+  var folder_type_4 = DriveApp.getFolderById(type_4)
+  var invoice_type_4 = folder_type_4.createFolder("Invoice").getId()
+  var type_5 = mainFolder.createFolder("Type 5").getId()
+  var folder_type_5 = DriveApp.getFolderById(type_5)
+  var invoice_type_5 = folder_type_5.createFolder("Invoice").getId()
+  var type_6 = mainFolder.createFolder("Type 6").getId()
+  var folder_type_6 = DriveApp.getFolderById(type_6)
+  var invoice_type_6 = folder_type_6.createFolder("Invoice").getId()
+  var type_7 = mainFolder.createFolder("Type 7").getId()
+  var folder_type_7 = DriveApp.getFolderById(type_7)
+  var invoice_type_7 = folder_type_7.createFolder("Invoice").getId()
+  var type_8 = mainFolder.createFolder("Type 8").getId()
+  var folder_type_8 = DriveApp.getFolderById(type_8)
+  var invoice_type_8 = folder_type_8.createFolder("Invoice").getId()
+  var type_9 = mainFolder.createFolder("Type 9").getId()
+  var folder_type_9 = DriveApp.getFolderById(type_9)
+  var invoice_type_9 = folder_type_9.createFolder("Invoice").getId()
+
+  // download Summary as PDF and save to mainFolder
+    // 1. Generate URL for Download Sheet as PDF
+    // 2. Use UrlFetchApp to get a file and get blob
+    // 3. DriveApp createfile
+    var gid_summary_id = id_sheet.getRange(21,2).getValue();
+    var pdf_option_summary =  "/export" + 
+                      "?format=pdf&" +                  // save as (pdf / csv / xml)
+                      "size=7&" +                       // paper size
+                      "fzr=true&" +                     // Repeat row header when print more than 1 sheet
+                      "portrait=true&"+                 // false = landscape
+                      "fitw=true&"+                     // fit to width
+                      "gridlines=false&"+               // 
+                      "printtitle=false&"+
+                      "sheetnames=false&"+
+                      "pagenum=UNDEFINED&"+
+                      "attachment=true"
+    
+    var print_range_summary =  "&gid="+ gid_summary_id +"&"+
+                        "ir=false&"+
+                        "ic=false&"+
+                        "r1=0&"+
+                        "c1=0&"+
+                        "r2=72&"+
+                        "c2=11"
+    
+    var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_summary + print_range_summary
+    var response = UrlFetchApp.fetch(url).getBlob()
+    mainFolder.createFile(response)
+
+  // download data as PDF ans save to folder_type
+    var pdf_option_data =  "/export" + 
+                      "?format=pdf&" +                  // save as (pdf / csv / xml)
+                      "size=7&" +                       // paper size
+                      "fzr=true&" +                     // Repeat row header when print more than 1 sheet
+                      "portrait=false&"+                // false = landscape
+                      "fitw=true&"+                     // fit to width
+                      "gridlines=true&"+                // 
+                      "printtitle=false&"+
+                      "sheetnames=false&"+
+                      "pagenum=UNDEFINED&"+
+                      "attachment=true"
+
+    // Get gid number
+    var gid_type_1_id = id_sheet.getRange(12,2).getValue();
+    var gid_type_2_id = id_sheet.getRange(13,2).getValue();
+    var gid_type_3_id = id_sheet.getRange(14,2).getValue();
+    var gid_type_4_id = id_sheet.getRange(15,2).getValue();
+    var gid_type_5_id = id_sheet.getRange(16,2).getValue();
+    var gid_type_6_id = id_sheet.getRange(17,2).getValue();
+    var gid_type_7_id = id_sheet.getRange(18,2).getValue();
+    var gid_type_8_id = id_sheet.getRange(19,2).getValue();
+    var gid_type_9_id = id_sheet.getRange(20,2).getValue();
+
+    // save type 1 as PDF and save to folder_type 1
+      // Set data length
+        var db_type_1 = accountingSummary.getSheetByName("DB:Type_1")
+        var db_type_1_row = db_type_1.getLastRow()
+        var db_type_1_col = db_type_1.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_1_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_1_row +"&"+
+                              "c2="+ db_type_1_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_1.createFile(response)
+    
+    // save type 2 as PDF and save to folder_type 2
+      // Set data length
+        var db_type_2 = accountingSummary.getSheetByName("DB:Type_2")
+        var db_type_2_row = db_type_2.getLastRow()
+        var db_type_2_col = db_type_2.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_2_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_2_row +"&"+
+                              "c2="+ db_type_2_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_2.createFile(response)
+    
+    // save type 3 as PDF and save to folder_type 3
+      // Set data length
+        var db_type_3 = accountingSummary.getSheetByName("DB:Type_3")
+        var db_type_3_row = db_type_3.getLastRow()
+        var db_type_3_col = db_type_3.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_3_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_3_row +"&"+
+                              "c2="+ db_type_3_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_3.createFile(response)
+
+    // save type 4 as PDF and save to folder_type 4
+      // Set data length
+        var db_type_4 = accountingSummary.getSheetByName("DB:Type_4")
+        var db_type_4_row = db_type_4.getLastRow()
+        var db_type_4_col = db_type_4.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_4_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_4_row +"&"+
+                              "c2="+ db_type_4_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_4.createFile(response)
+
+    // save type 5 as PDF and save to folder_type 5
+      // Set data length
+        var db_type_5 = accountingSummary.getSheetByName("DB:Type_5")
+        var db_type_5_row = db_type_5.getLastRow()
+        var db_type_5_col = db_type_5.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_5_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_5_row +"&"+
+                              "c2="+ db_type_5_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_5.createFile(response)
+
+    // save type 6 as PDF and save to folder_type 6
+      // Set data length
+        var db_type_6 = accountingSummary.getSheetByName("DB:Type_6")
+        var db_type_6_row = db_type_6.getLastRow()
+        var db_type_6_col = db_type_6.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_6_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_6_row +"&"+
+                              "c2="+ db_type_6_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_6.createFile(response)
+
+    // save type 7 as PDF and save to folder_type 7
+      // Set data length
+        var db_type_7 = accountingSummary.getSheetByName("DB:Type_7")
+        var db_type_7_row = db_type_7.getLastRow()
+        var db_type_7_col = db_type_7.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_7_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_7_row +"&"+
+                              "c2="+ db_type_7_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_7.createFile(response)
+    
+    // save type 8 as PDF and save to folder_type 8
+      // Set data length
+        var db_type_8 = accountingSummary.getSheetByName("DB:Type_8")
+        var db_type_8_row = db_type_8.getLastRow()
+        var db_type_8_col = db_type_8.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_8_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_8_row +"&"+
+                              "c2="+ db_type_8_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_8.createFile(response)
+    
+    // save type 9 as PDF and save to folder_type 9
+      // Set data length
+        var db_type_9 = accountingSummary.getSheetByName("DB:Type_9")
+        var db_type_9_row = db_type_9 .getLastRow()
+        var db_type_9_col = db_type_9.getLastColumn()
+      // Save
+        var print_range_data =  "&gid="+ gid_type_9_id +"&"+
+                              "ir=false&"+
+                              "ic=false&"+
+                              "r1=0&"+
+                              "c1=0&"+
+                              "r2="+ db_type_9_row +"&"+
+                              "c2="+ db_type_9_col
+
+        var url = "https://docs.google.com/spreadsheets/d/" + accountingSummaryId + pdf_option_data + print_range_data
+        var response = UrlFetchApp.fetch(url).getBlob()
+        folder_type_9.createFile(response)
+
+    Logger.log("End generateFolderAndCover()")
+    sendToIntegromat()
+
+  function sendToIntegromat() {
+    Logger.log("Start sendtoIntergromat()")
+    var id_workbook = SpreadsheetApp.openById("1oqcDtndzc7VGEUarpFZoQ3IrgUh_Y0TSbUTcWbVQDLc");
+    var id_sheet = id_workbook.getSheetByName("ID");
+    //Set Sheet
+    
+    var trigger_sheet_id = id_sheet.getRange(7,2).getValue();
+    var trigger_sheet = SpreadsheetApp.openById(trigger_sheet_id)
+    var trigger_workbook = trigger_sheet.getSheetByName("Trigger")
+
+    //Set Value
+    var check_row = trigger_workbook.getLastRow()
+    Logger.log(check_row)
+    if (check_row == 1) {
+      var create_time = 0
+      var create_time = create_time + 1
+    } else {
+      var create_time = trigger_workbook.getRange(trigger_workbook.getLastRow(),1).getValue()
+      var create_time = create_time + 1
+    }
+      var currentDate = new Date()
+    Logger.log(create_time)
+
+    //Add new row
+    trigger_workbook.getRange(check_row + 1,1).setValue(create_time)
+    trigger_workbook.getRange(check_row + 1,2).setValue(currentDate)
+    trigger_workbook.getRange(check_row + 1,3).setValue(invoice_type_1)
+    trigger_workbook.getRange(check_row + 1,4).setValue(invoice_type_2)
+    trigger_workbook.getRange(check_row + 1,5).setValue(invoice_type_3)
+    trigger_workbook.getRange(check_row + 1,6).setValue(invoice_type_4)
+    trigger_workbook.getRange(check_row + 1,7).setValue(invoice_type_5)
+    trigger_workbook.getRange(check_row + 1,8).setValue(invoice_type_6)
+    trigger_workbook.getRange(check_row + 1,9).setValue(invoice_type_7)
+    trigger_workbook.getRange(check_row + 1,10).setValue(invoice_type_8)
+    trigger_workbook.getRange(check_row + 1,11).setValue(invoice_type_9)
+
+    Logger.log("End sendtoIntergromat()")
+  }
+}
